@@ -56,6 +56,7 @@ train_data = outer
 
 start_probability(train_data)
  
+# states = sorted(counter, key=counter.get, reverse=True) Maybe we can use this to extract the states from a count of the entire dataset - although there are only 12. We could also hardcode...
 """
 
 states = ('pineapple','me','pear')
