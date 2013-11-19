@@ -1,21 +1,62 @@
+from __future__ import division
+from collections import Counter
+
+#########################################################
+#
+#       Global functions
+#
+########################################################
+
+def start_probability(data):
+#a function which takes data and calculates the start probability 
+#i.e. it counts the number of each POS of eyery first word of every 
+#sentence and divide each og them by the number of sentences. 
+#It returns a dictionary: The POS is the key and the probability 
+# of that POS being assignned to the first words is the value
+    numberofsentences = len(data)
+    firstword = []
+    dict = {}
+    for x in train_data:
+        firstword.append(x[0])
+    dict = Counter(POS for word, POS in firstword[:len(firstword)-1])
+    for entry in dict.items():
+        dict[entry[0]] = entry[1] / numberofsentences
+    return dict
+
+#########################################################
+#
+#       Loading in files
+#
+########################################################
 
 train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 train_file2 = open(train_file).read().split("\n\n")
+test_file2 = open(test_file).read().split("\n\n")
+
 #split by single newline aka by every word-category-pair
 train_list = [i.split('\n') for i in train_file2]
+test_list = [i.split('\n') for i in test_file2]
 
+#structuring the data as nested lists 
 inner = []
 outer = []
 
 for x in range(len(train_list)):
-  
-  inner = [m.split('\t') for m in train_list[x]]
-  
-  outer.append(inner)
-
+    inner = [m.split('\t') for m in train_list[x]]
+    outer.append(inner)
 train_data = outer
+########################################################
+#
+#       counting...
+#
+########################################################
+
+start_probability(train_data)
+ 
+"""
 
 states = ('pineapple','me','pear')
  
@@ -23,7 +64,7 @@ states = ('pineapple','me','pear')
 
 observations = ('me','pe','pe','me')
  
-start_probability = {'pineapple': 0.1, 'me': 0.8, 'pear': 0.1} #the number of wordfclass of the first word in each sentence divided by number of tweets
+start_probability = {'pineapple': 0.1, 'me': 0.8, 'pear': 0.1} #the number of POS of the first word in each sentence divided by number of tweets
 #count number of nouns followed by verbs and divide by total number of nouns
 transition_probability = {
    'pineapple' : {'pineapple': 0.0, 'me': 0.7, 'pear': 0.3},
@@ -31,7 +72,7 @@ transition_probability = {
    'pear' : {'pineapple': 0.3, 'me': 0.7, 'pear': 0.0}
    }
  
-emission_probability = { # for every observation: how many times "I" is a noun by the number of nouns
+emission_probability = { # for every observation: how many times "I" is a noun divide by the number of nouns
    'pineapple' : {'me': 0.1, 'pe': 0.9},
    'me' : {'me': 0.9, 'pe': 0.1},
    'pear' : {'me': 0.3, 'pe': 0.7},
@@ -82,3 +123,5 @@ def example():
                    transition_probability,
                    emission_probability)
 print example()
+
+"""
