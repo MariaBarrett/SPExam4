@@ -9,13 +9,14 @@ from collections import Counter
 
 def start_probability(data):
 #a function which takes data and calculates the start probability 
-#i.e. it counts the number of each POS of eyery first word of every 
-#sentence and divide each og them by the number of sentences. 
+#i.e. it counts the number of each POS of every first word of every 
+#sentence and divide each of them by the number of sentences. 
 #It returns a dictionary: The POS is the key and the probability 
-# of that POS being assignned to the first words is the value
+# of that POS being assigned to the first word is the value
     numberofsentences = len(data)
     firstword = []
     dict = {}
+
     for x in train_data:
         firstword.append(x[0])
     dict = Counter(POS for word, POS in firstword[:len(firstword)-1])
@@ -23,14 +24,28 @@ def start_probability(data):
         dict[entry[0]] = entry[1] / numberofsentences
     return dict
 
+###########################################################
+#
+#       Transition probabilities
+#
+###########################################################
+def trans_probability(data):
+  numberofsentences = len(data)
+  firstword = []
+  secondword = []
+  
+
+
+
+
 #########################################################
 #
 #       Loading in files
 #
 ########################################################
 
-train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+train_file = ('twitter-POS/train.google')
+test_file = ('twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 train_file2 = open(train_file).read().split("\n\n")
@@ -48,14 +63,15 @@ for x in range(len(train_list)):
     inner = [m.split('\t') for m in train_list[x]]
     outer.append(inner)
 train_data = outer
+
 ########################################################
 #
 #       counting...
 #
 ########################################################
 
-start_probability(train_data)
- 
+print start_probability(train_data)
+
 # states = sorted(counter, key=counter.get, reverse=True) Maybe we can use this to extract the states from a count of the entire dataset - although there are only 12. We could also hardcode...
 """
 
