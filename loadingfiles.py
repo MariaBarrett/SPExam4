@@ -24,6 +24,8 @@ def start_probability(data):
         dict[entry[0]] = entry[1] / numberofsentences
     return dict
 
+
+
 ###########################################################
 #
 #       Transition probabilities
@@ -44,8 +46,11 @@ def trans_probability(data):
 #
 ########################################################
 
-train_file = ('twitter-POS/train.google')
-test_file = ('twitter-POS/test.google')
+train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+
+#train_file = ('twitter-POS/train.google')
+#test_file = ('twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 train_file2 = open(train_file).read().split("\n\n")
@@ -70,7 +75,11 @@ train_data = outer
 #
 ########################################################
 
-print start_probability(train_data)
+#prepare for nltk. I like the way it's done, but suddenly I doubt whether we are going to use it. NLTK does not want the nested list structure, right?
+train_data_nltk = [[[x.replace('/','-') for x in l] for l in s] for s in train_data]
+
+
+#print start_probability(train_data)
 
 # states = sorted(counter, key=counter.get, reverse=True) Maybe we can use this to extract the states from a count of the entire dataset - although there are only 12. We could also hardcode...
 """
