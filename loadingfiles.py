@@ -25,22 +25,29 @@ def start_probability(data):
     return dict
 
 
+def state(data):
+# a function that returns a list of the different POS-tags aka states. 
+    state = []
+    for x in data:
+        for y in x:
+            if len(y) > 1: 
+                if y[1] not in state:
+                    state.append(y[1])
+    return state
 
 ###########################################################
 #
 #       Transition probabilities
 #
 ###########################################################
-def trans_probability(data):
-  numberofsentences = len(data)
-  firstword = []
-  secondword = []
 
-  for sent in data:
-
-    for w in range(len(sent)):
-      print w
-
+def transistion_prob(data):
+    for x in state(data):
+        for i in range(len(data)):
+            for ii in data[i]:
+                if ii[1] == x:
+                    POScount = Counter(i[2][1])
+                
 
 
 #########################################################
@@ -84,7 +91,9 @@ train_data_nltk = [[[x.replace('/','-') for x in l] for l in s] for s in train_d
 
 #print start_probability(train_data)
 
-# states = sorted(counter, key=counter.get, reverse=True) Maybe we can use this to extract the states from a count of the entire dataset - although there are only 12. We could also hardcode...
+
+transistion_prob(train_data)
+
 """
 
 states = ('pineapple','me','pear')
