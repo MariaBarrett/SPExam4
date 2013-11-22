@@ -33,8 +33,11 @@ def trans_probability(data):
   numberofsentences = len(data)
   firstword = []
   secondword = []
-  
 
+  for sent in data:
+
+    for w in range(len(sent)):
+      print w
 
 
 
@@ -71,7 +74,7 @@ train_data = outer
 ########################################################
 
 print start_probability(train_data)
-
+print trans_probability(train_data)
 # states = sorted(counter, key=counter.get, reverse=True) Maybe we can use this to extract the states from a count of the entire dataset - although there are only 12. We could also hardcode...
 """
 
