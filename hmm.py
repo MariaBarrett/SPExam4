@@ -48,7 +48,8 @@ class BestHMM:
     self.name = BestHMM
     self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
     self.POS_list= [] # a 1D list of all POS in the order they appear in the train set [POS1, POS2, POS3...]
-    self.Word_POS = [] # a nested list of all words with their adjecent POS
+    self.Word_POS = [] # Word_POS represents all categorized words that belong to the same POS i.e. Word_POS[1] represents all words that are nouns
+
 
     print '(Initializing %s)' % self.name
 
@@ -77,7 +78,7 @@ class BestHMM:
         for data in Data:
             self.Calculate_list.append(data)
 
-    #Count the number of every POS
+    #Count the number of every POS and append them to POS_list
     count=Counter(Pos for word,Pos in Calculate_list[:len(Calculate_list)-1]) #Empty list at the end we want to circumvent
     for entry in count.items():
         POS_list.append(entry[0])
@@ -88,12 +89,13 @@ class BestHMM:
      for m in range(len(Calculate_list)-1):#Again empty element
         if Calculate_list[m][1]==POS_list[n]:
             Word_POS[n].append(Calculate_list[m][0])
-    # Word_POS represents all categorized words that belong to the same group of sentences such as Word_POS[1] represents all words that are noun
+    
 
-    emission=[]
+    emission=[] # this list contains a list of counters of words belonging to every POS.
     for i in range(len(POS_list)):
-      emission.append(Counter( word for word in Word_POS[i]))#Caculate every word's number in Noun word list
-    #Here count2 is a list of Counters and in each item of Counter is word:probability
+      emission.append(Counter( word for word in Word_POS[i])) #Count number of words belonging to every POS
+    #Here count2 is a list of Counters and each item of Counter is word:probability
+    # I don't understad. What is count2?
     for m in range(len(POS_list)):
      for item in emission[m].items():
           emission[m][item[0]]=item[1]/count[POS_list[m]]
@@ -110,10 +112,11 @@ class BestHMM:
 
 
   def Tr_prob(self,train_data):
+  #this function count how many times a transistion between any POS tags occur. There are 12 different POS. Therefore the transistions are plotted in a 12 by 12 matrix 
     transition=numpy.zeros(12*12).reshape((12,12))    
     Sum=[]
-    transitiondict={}
-    transitionDict={}
+    transitiondict={} #temporary dictionary
+    transitionDict={} # a dictionary of dictionaies. Contains probabilities of transistions between all POS
     POS_list = self.POS_list
 
     for i in range(len(train_data)):
@@ -122,18 +125,18 @@ class BestHMM:
                 for n in range(len(POS_list)):
                   if train_data[i][j][1]==POS_list[m] and train_data[i][j+1][1] and train_data[i][j+1][1]==POS_list[n] :
                       transition[m][n]+=1
-
+# The result from transition matrix is plotted in the Sum list
     sum=0
     for i in range(len(POS_list)):
         for j in range(len(POS_list)):
           sum+=transition[i][j] 
         Sum.append(sum) 
         sum=0
-
+# - and every count is divided by the number of times the start POS occurs
     for i in range(len(POS_list)):
         for j in range(len(POS_list)):
           transition[i][j]=transition[i][j]/Sum[i]
-
+# finally added to the transitionsDict 
     for i in range(len(POS_list)):
         for j in range(len(POS_list)):
             transitiondict[POS_list[j]]=transition[i][j]
@@ -144,9 +147,10 @@ class BestHMM:
 
 
   def St_prob(self,train_data):
-    startdict={}
+# Start probability this function calculates the probability that a POS belongs to the first word of a tweet
+    startdict={} # contains the POS and count
     sum_start=0
-    Start_word=[]
+    Start_word=[] # a list of all first words of all tweets
 
     for i in range(len(train_data)-1):
         Start_word.append(train_data[i][0][1])
