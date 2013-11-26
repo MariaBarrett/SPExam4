@@ -25,7 +25,7 @@ test_list = [i.split('\n') for i in test_file2]
 
 def prepare_data(train_list):
 #this function returns a list of list of the train data. It has the foloowing structure:
-#[[tweet1[word1, POS1],[word2, POS2]...]] [tweet2[word1, POS1]...]...]. 
+#[[tweet1[word1, pos1],[word2, pos2]...]] [tweet2[word1, pos1]...]...]. 
 #converts to lowercase
   inner = []
   outer = []
@@ -48,7 +48,7 @@ class BestHMM:
   def __init__(self):
     self.name = BestHMM
     self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
-    self.POS_list= [] # a 1D list of all POS in the order they appear in the train set [POS1, POS2, POS3...]
+    self.POS_list= [] # a 1D list of all POS 
     self.Word_POS = [] # Word_POS represents all categorized words that belong to the same POS i.e. Word_POS[1] represents all words that are nouns
 
 
