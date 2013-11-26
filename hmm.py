@@ -18,19 +18,20 @@ test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google'
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
 train_file2 = open(train_file).read().split("\n\n")
+
 #split by single newline aka by every word-category-pair
 train_list = [i.split('\n') for i in train_file2]
 test_list = [i.split('\n') for i in test_file2]
 
-
 def prepare_data(train_list):
 #this function returns a list of list of the train data. It has the foloowing structure:
-#[[tweet1[word1, POS1],[word2, POS2]...]] [tweet2[word1, POS1]...]...]
+#[[tweet1[word1, POS1],[word2, POS2]...]] [tweet2[word1, POS1]...]...]. 
+#converts to lowercase
   inner = []
   outer = []
 
   for x in range(len(train_list)):
-    inner = [m.split('\t') for m in train_list[x]]
+    inner = [m.lower().split('\t') for m in train_list[x]]
     outer.append(inner)
   train_data = outer
   return train_data
