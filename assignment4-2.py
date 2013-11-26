@@ -9,12 +9,12 @@ import numpy
 #       Opening & preparing our train and test set
 #
 ######################################################
-
-#train_file = ('twitter-POS/train.google')
-#test_file = ('twitter-POS/test.google')
 train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
 test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
+
+#train_file = ('twitter-POS/train.google')
+#test_file = ('twitter-POS/test.google')
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
 train_file2 = open(train_file).read().split("\n\n")
@@ -23,9 +23,8 @@ train_list = [i.split('\n') for i in train_file2]
 test_list = [i.split('\n') for i in test_file2]
 
 
+
 def prepare_data(train_list):
-#this function returns a list of list of the train data. It has the foloowing structure:
-#[[tweet1[word1, POS1],[word2, POS2]...]] [tweet2[word1, POS1]...]...]
   inner = []
   outer = []
 
@@ -46,15 +45,15 @@ class BestHMM:
 
   def __init__(self):
     self.name = BestHMM
-    self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
-    self.POS_list= [] # a 1D list of all POS in the order they appear in the train set [POS1, POS2, POS3...]
-    self.Word_POS = [] # a nested list of all words with their adjecent POS
+    self.Calculate_list = []
+    self.POS_list= []
+    self.Word_POS = []
 
     print '(Initializing %s)' % self.name
 
 
   def state_obs(self,test_list):
-#what does this do?
+
     for Data in test_list:
       for data in Data:
         "do nothing"
@@ -72,7 +71,7 @@ class BestHMM:
     Calculate_list = self.Calculate_list
     POS_list = self.POS_list
   #Caculate the emission probabilities
-  #Get the list of [word,POS] out of the nested list that groups each sentence
+  #Get the list of [word,POS]
     for Data in train_data:
         for data in Data:
             self.Calculate_list.append(data)
@@ -100,12 +99,18 @@ class BestHMM:
 
     emissiondict={}
     emissionDict={}
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # we changed the emission probability and now it contains all words in our corpus
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     for i in range(len(POS_list)):
-        for item in emission[i].items():
-            emissiondict[item[0]]=item[1]
-        emissionDict[POS_list[i]]=emissiondict
-        emissiondict={}
-
+     for words in Calculate_list:
+        for word in words:
+         if word in emission[i].keys(): 
+            emissiondict[word]=emission[i][word]
+         else: emissiondict[word]=0.0
+     emissionDict[POS_list[i]]=emissiondict
+     emissiondict={}
+    
     return emissionDict
 
 
@@ -185,16 +190,16 @@ class BestHMM:
       for y in states:
           V[0][y] = start_p[y]*emit_p[y][obs[0]]
           path[y] = [y]
-   
+      
       # Run Viterbi for t > 0
-      for t in range(1,len(obs)):
+      for t in range(1,len(obs)-1):
           V.append({})
           newpath = {}
    
           for y in states:
-              (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][obs[t]], y0) for y0 in states])
-              V[t][y] = prob
-              newpath[y] = path[state] + [y]
+                  (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][obs[t]], y0) for y0 in states])
+                  V[t][y] = prob
+                  newpath[y] = path[state] + [y]
    
           # Don't need to remember the old paths
           path = newpath
@@ -223,8 +228,8 @@ emissionDict = HMM.Em_prob(train_data)
 transitionDict = HMM.Tr_prob(train_data)
 startDict = HMM.St_prob(train_data)
 
-print startDict
-print emissionDict
+#print startDict
+#print emissionDict
 
 observations = []
 for elem in test_data:
