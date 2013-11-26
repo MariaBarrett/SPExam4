@@ -17,7 +17,7 @@ def start_probability(data):
     firstword = []
     dict = {}
 
-    for x in train_data:
+    for x in data:
         firstword.append(x[0])
     dict = Counter(POS for word, POS in firstword[:len(firstword)-1])
     for entry in dict.items():
@@ -41,13 +41,6 @@ def state(data):
 #
 ###########################################################
 
-def transistion_prob(data):
-    for x in state(data):
-        for i in range(len(data)):
-            for ii in data[i]:
-                if ii[1] == x:
-                    POScount = Counter(i[2][1])
-                
 
 
 #########################################################
@@ -89,10 +82,7 @@ train_data = outer
 #prepare for nltk. I like the way it's done, but suddenly I doubt whether we are going to use it. NLTK does not want the nested list structure, right?
 train_data_nltk = [[[x.replace('/','-') for x in l] for l in s] for s in train_data]
 
-#print start_probability(train_data)
-
-
-transistion_prob(train_data)
+print start_probability(train_data)
 
 """
 
