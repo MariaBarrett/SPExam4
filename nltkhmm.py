@@ -11,11 +11,11 @@ def strip(l):
 	return nl
 
 
-#train = list(nltk.corpus.TaggedCorpusReader("/home/alex/Documents/ITandCognition/Scientific Programming/SPExam4/twitter-POS",sys.argv[1],sep="/").tagged_sents())
-#test = list(nltk.corpus.TaggedCorpusReader("/home/alex/Documents/ITandCognition/Scientific Programming/SPExam4/twitter-POS",sys.argv[2],sep="/").tagged_sents())
+train = list(nltk.corpus.TaggedCorpusReader("/home/alex/Documents/ITandCognition/Scientific Programming/SPExam4/twitter-POS",sys.argv[1],sep="/").tagged_sents())
+test = list(nltk.corpus.TaggedCorpusReader("/home/alex/Documents/ITandCognition/Scientific Programming/SPExam4/twitter-POS",sys.argv[2],sep="/").tagged_sents())
 
-train = list(nltk.corpus.TaggedCorpusReader("/Users/Maria/Documents/ITandcognition/bin/twitter-POS",sys.argv[1],sep="/").tagged_sents())
-test = list(nltk.corpus.TaggedCorpusReader("/Users/Maria/Documents/ITandcognition/bin/twitter-POS",sys.argv[2],sep="/").tagged_sents())
+#train = list(nltk.corpus.TaggedCorpusReader("/Users/Maria/Documents/ITandcognition/bin/twitter-POS",sys.argv[1],sep="/").tagged_sents())
+#test = list(nltk.corpus.TaggedCorpusReader("/Users/Maria/Documents/ITandcognition/bin/twitter-POS",sys.argv[2],sep="/").tagged_sents())
 
 hmmt  =nltk.tag.HiddenMarkovModelTrainer()
 hmm = hmmt.train(labelled_sequences=train)
@@ -25,7 +25,6 @@ sys.stderr.write("done training...\n")
 (bl,cor,tot) = (0,0,0)
 
 for t in test:
-	print hmm.log_probability(t)
 	ind = 0
 	for e in hmm.tag(strip(t)):
 		(word,pred)=e
