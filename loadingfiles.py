@@ -1,90 +1,7 @@
 from __future__ import division
 from collections import Counter
 
-#########################################################
-#
-#       Global functions
-#
-########################################################
 
-def start_probability(data):
-#a function which takes data and calculates the start probability 
-#i.e. it counts the number of each POS of every first word of every 
-#sentence and divide each of them by the number of sentences. 
-#It returns a dictionary: The POS is the key and the probability 
-# of that POS being assigned to the first word is the value
-    numberofsentences = len(data)
-    firstword = []
-    dict = {}
-
-    for x in data:
-        firstword.append(x[0])
-    dict = Counter(POS for word, POS in firstword[:len(firstword)-1])
-    for entry in dict.items():
-        dict[entry[0]] = entry[1] / numberofsentences
-    return dict
-
-
-def state(data):
-# a function that returns a list of the different POS-tags aka states. 
-    state = []
-    for x in data:
-        for y in x:
-            if len(y) > 1: 
-                if y[1] not in state:
-                    state.append(y[1])
-    return state
-
-###########################################################
-#
-#       Transition probabilities
-#
-###########################################################
-
-
-
-#########################################################
-#
-#       Loading in files
-#
-########################################################
-
-train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
-
-#train_file = ('twitter-POS/train.google')
-#test_file = ('twitter-POS/test.google')
-
-#split by double newline aka by every new tweet
-train_file2 = open(train_file).read().split("\n\n")
-test_file2 = open(test_file).read().split("\n\n")
-
-#split by single newline aka by every word-category-pair
-train_list = [i.split('\n') for i in train_file2]
-test_list = [i.split('\n') for i in test_file2]
-
-#structuring the data as nested lists 
-inner = []
-outer = []
-
-for x in range(len(train_list)):
-    inner = [m.split('\t') for m in train_list[x]]
-    outer.append(inner)
-train_data = outer
-
-########################################################
-#
-#       counting...
-#
-########################################################
-
-
-#prepare for nltk. I like the way it's done, but suddenly I doubt whether we are going to use it. NLTK does not want the nested list structure, right?
-train_data_nltk = [[[x.replace('/','-') for x in l] for l in s] for s in train_data]
-
-print start_probability(train_data)
-
-"""
 
 states = ('pineapple','me','pear')
  
@@ -151,5 +68,3 @@ def example():
                    transition_probability,
                    emission_probability)
 print example()
-
-"""

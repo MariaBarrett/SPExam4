@@ -9,12 +9,12 @@ import numpy
 #       Opening & preparing our train and test set
 #
 ######################################################
-train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+#train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+#test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
 
-#train_file = ('twitter-POS/train.google')
-#test_file = ('twitter-POS/test.google')
+train_file = ('twitter-POS/train.google')
+test_file = ('twitter-POS/test.google')
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
 train_file2 = open(train_file).read().split("\n\n")

@@ -10,10 +10,10 @@ import numpy
 #
 ######################################################
 
-#train_file = ('twitter-POS/train.google')
-#test_file = ('twitter-POS/test.google')
-train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+train_file = ('twitter-POS/train.google')
+test_file = ('twitter-POS/test.google')
+#train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+#test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
@@ -24,7 +24,7 @@ train_list = [i.split('\n') for i in train_file2]
 test_list = [i.split('\n') for i in test_file2]
 
 def prepare_data(train_list):
-#this function returns a list of list of the train data. It has the foloowing structure:
+#this function returns a list of list of the train data. It has the following structure:
 #[[tweet1[word1, pos1],[word2, pos2]...]] [tweet2[word1, pos1]...]...]. 
 #converts to lowercase
   inner = []
@@ -50,6 +50,7 @@ class BestHMM:
     self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
     self.POS_list= [] # a 1D list of all POS 
     self.Word_POS = [] # Word_POS represents all categorized words that belong to the same POS i.e. Word_POS[1] represents all words that are nouns
+    self.Start_word = []
 
 
     print '(Initializing %s)' % self.name
@@ -92,15 +93,15 @@ class BestHMM:
             Word_POS[n].append(Calculate_list[m][0])
     
 
-    emission=[] # this list contains a list of counters of words belonging to every POS.
+    emission=[] # this list will contain a list of counters of words belonging to every POS.
     for i in range(len(POS_list)):
       emission.append(Counter( word for word in Word_POS[i])) #Count number of words belonging to every POS
-    #Here count2 is a list of Counters and each item of Counter is word:probability
-    # I don't understad. What is count2?
+    
     for m in range(len(POS_list)):
      for item in emission[m].items():
           emission[m][item[0]]=item[1]/count[POS_list[m]]
 
+    
     emissiondict={}
     emissionDict={}
     for i in range(len(POS_list)):
@@ -151,7 +152,7 @@ class BestHMM:
 # Start probability this function calculates the probability that a POS belongs to the first word of a tweet
     startdict={} # contains the POS and count
     sum_start=0
-    Start_word=[] # a list of all first words of all tweets
+    Start_word=self.Start_word # a list of all first words of all tweets
 
     for i in range(len(train_data)-1):
         Start_word.append(train_data[i][0][1])
@@ -185,10 +186,12 @@ class BestHMM:
   def viterbi(self, obs, states, start_p, trans_p, emit_p):
       V = [{}]
       path = {}
+      Start_word = self.Start_word
    
       # Initialize base cases (t == 0)
       for y in states:
-          V[0][y] = start_p[y]*emit_p[y][obs[0]]
+        for x in emit_p[y]:
+          V[0][y] = start_p[y]*emit_p[y][Start_word[x]]
           path[y] = [y]
    
       # Run Viterbi for t > 0
@@ -230,11 +233,13 @@ startDict = HMM.St_prob(train_data)
 
 print startDict
 print emissionDict
+print transitionDict
 
 observations = []
 for elem in test_data:
   for el in elem:
     observations.append(el[0])
+
 
 states = startDict.keys()
 
