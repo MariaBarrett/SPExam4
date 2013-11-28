@@ -235,8 +235,6 @@ class BestHMM:
     for i in range(len(pred)):
       labels.extend(pred[i][1])
     
-    print label
-    print labels
     for i in range(len(labels)-1): #We're not interested in its confidence level, just its predictions and the last element is empty
         if labels[i] == label[i]: #This should be pretty straightforward!
           correct+=1          
