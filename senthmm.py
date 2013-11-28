@@ -6,14 +6,14 @@ import numpy
 
 ######################################################
 #
-#       Opening & preparing our train and test set
+#       Opening & preparing train and test set
 #
 ######################################################
 
-train_file = ('twitter-POS/train.google')
-test_file = ('twitter-POS/test.google')
-#train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-#test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+#train_file = ('twitter-POS/train.google')
+#test_file = ('twitter-POS/test.google')
+train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
@@ -57,11 +57,6 @@ class BestHMM:
 
 
   def state_obs(self,test_list):
-#what does this do?
-    for Data in test_list:
-      for data in Data:
-        "do nothing"
-
     states=POS_list
     observations=[]
     for i in range(len(Word_POS)):
@@ -81,6 +76,7 @@ class BestHMM:
             self.Calculate_list.append(data)
 
     #Count the number of every POS and append them to POS_list
+
     count=Counter(Pos for word,Pos in Calculate_list[:len(Calculate_list)-1]) #Empty list at the end we want to circumvent
     for entry in count.items():
         POS_list.append(entry[0])
@@ -212,7 +208,7 @@ class BestHMM:
           newpath = {}
 
           for y in states:
-            if obs[t] in emit_p[y].keys(): #Check whether the word exists in our sentences
+            if obs[t] in emit_p[y].keys(): #Check whether the word exists in the sentences
               (prob,state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][obs[t]],y0) for y0 in states])
             else:
               (prob,state) = max([(V[t-1][y0]*trans_p[y0][y]*0.0833,y0) for y0 in states]) # We don't know what class unknown words are, therefore they are equally likely 1/12
@@ -236,7 +232,7 @@ class BestHMM:
       labels.extend(pred[i][1])
     
     for i in range(len(labels)-1): #We're not interested in its confidence level, just its predictions and the last element is empty
-        if labels[i] == label[i]: #This should be pretty straightforward!
+        if labels[i] == label[i]: 
           correct+=1          
     result = correct / len(label)
 
@@ -257,7 +253,7 @@ class BestHMM:
 train_data = prepare_data(train_list)
 test_data = prepare_data(test_list)
 
-#Here we define our needed variables to create predictions
+#Defining the needed variables to create predictions
 HMM = BestHMM()
 emissionDict = HMM.Em_prob(train_data)
 transitionDict = HMM.Tr_prob(train_data)
@@ -268,7 +264,7 @@ labels = []
 
 
 #-----------------------------------------------------------------
-#Preparing data for our HMM
+#Preparing data 
 for elem in test_data:
   sent = []
   for el in elem:

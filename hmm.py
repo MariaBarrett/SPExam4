@@ -6,14 +6,14 @@ import numpy
 
 ######################################################
 #
-#       Opening & preparing our train and test set
+#       Opening & preparing train and test set
 #
 ######################################################
 
-train_file = ('twitter-POS/train.google')
-test_file = ('twitter-POS/test.google')
-#train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-#test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+#train_file = ('twitter-POS/train.google')
+#test_file = ('twitter-POS/test.google')
+train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
@@ -50,18 +50,13 @@ class BestHMM:
     self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
     self.POS_list= [] # a 1D list of all POS 
     self.Word_POS = [] # Word_POS represents all categorized words that belong to the same POS i.e. Word_POS[1] represents all words that are nouns
-    self.Start_word = []
+    self.Start_word = [] # a list of all first words of all tweets
 
 
     print '(Initializing %s)' % self.name
 
 
   def state_obs(self,test_list):
-#what does this do?
-    for Data in test_list:
-      for data in Data:
-        "do nothing"
-
     states=POS_list
     observations=[]
     for i in range(len(Word_POS)):
@@ -69,7 +64,7 @@ class BestHMM:
            observations.append(Word_POS[i][j])
 
 #---------------------------------------------------------------------------
-# Here we begin the probability calculations
+# Beginning of probability calculations
 
   def Em_prob(self,train_data):
     Calculate_list = self.Calculate_list
@@ -155,7 +150,7 @@ class BestHMM:
 # Start probability this function calculates the probability that a POS belongs to the first word of a tweet
     startdict={} # contains the POS and count
     sum_start=0
-    Start_word=self.Start_word # a list of all first words of all tweets
+    Start_word=self.Start_word 
 
     for i in range(len(train_data)-1):
         Start_word.append(train_data[i][0][1])
@@ -172,7 +167,7 @@ class BestHMM:
 
 
 #---------------------------------------------------------------------------
-# Here we begin to get the viterbi patch
+# Here we begin to get the viterbi path
 
   def print_dptable(self, V):
       print "    ",
@@ -205,7 +200,7 @@ class BestHMM:
 
         for y in states:
           for s in obs[t]:
-            if s in emit_p[y].keys(): #Check whether the word exists in our t
+            if s in emit_p[y].keys(): #Check whether the word exists
                (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][s], y0) for y0 in states])
             else:
               (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*0.1, y0) for y0 in states]) # We don't know what class unknown words are, therefore they are equally likely 1/10
@@ -250,7 +245,7 @@ class BestHMM:
 train_data = prepare_data(train_list)
 test_data = prepare_data(test_list)
 
-#Here we define our needed variables to create predictions
+#Defining the needed variables to create predictions
 HMM = BestHMM()
 emissionDict = HMM.Em_prob(train_data)
 transitionDict = HMM.Tr_prob(train_data)
@@ -260,7 +255,7 @@ observations = []
 labels = []
 
 #-----------------------------------------------------------------
-#Preparing data for our HMM
+#Preparing data for the HMM
 for elem in test_data:
   sent = []
 
@@ -276,6 +271,6 @@ states = startDict.keys()
 #------------------------------------------------------------------
 #The ACTUAL calls...
 
-Fit = HMM.Fit(observations,states) #Somewhat similar to how SKLearn classifiers' .fit(train) works, but we need to store the result instead
+Fit = HMM.Fit(observations,states) #Somewhat similar to how SKLearn classifiers' .fit(train) works, but need to store the result instead
 print Fit #Optional for table / confidence of path + path.. The confidence is quite depressing!
 HMM.Score(Fit,labels)
