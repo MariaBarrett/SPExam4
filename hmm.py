@@ -188,38 +188,38 @@ class BestHMM:
   # visualize viterbi
   def viterbi(self, obs, states, start_p, trans_p, emit_p):
       V = [{}]
-      path = {}
       Start_word = self.Start_word
-
+      path=[]
+      fullpath={}#it's a lie!
 
       # Initialize base cases (t == 0)
       for y in states:
-        for x in range(len(Start_word)):
-          V[0][y] = start_p[y]*emit_p[y][Start_word[x]]
-          path[y] = [y]
-      
+
+          if obs[0] in emit_p[y].keys():
+            V[0][y] = start_p[y] * emit_p[y][obs[0]]
+          else:
+            V[0][y] = start_p[y] * 0.0833
+
+          fullpath[y] = [y] #We now have a a dict with the start probabilities
+
       # Run Viterbi for t > 0
       for t in range(1,len(obs)):
-        V.append({})
-        newpath = {}
+          V.append({})
+          newpath = {}
 
-        for y in states:
-          for s in obs[t]:
-            if s in emit_p[y].keys(): #Check whether the word exists in our t
-               (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][s], y0) for y0 in states])
+          for y in states:
+            if obs[t] in emit_p[y].keys(): #Check whether the word exists in our sentences
+              (prob,state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][obs[t]],y0) for y0 in states])
             else:
-              (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*0.1, y0) for y0 in states]) # We don't know what class unknown words are, therefore they are equally likely 1/10
-            
+              (prob,state) = max([(V[t-1][y0]*trans_p[y0][y]*0.0833,y0) for y0 in states]) # We don't know what class unknown words are, therefore they are equally likely 1/12, although the actual number is redundant
+          
             V[t][y] = prob
-            newpath[y] = path[state] + [y]  
-        
-          # Don't need to remember the old paths
-        path = newpath
+            newpath[y] = fullpath[state] + [y]
+          fullpath = newpath
    
-      #self.print_dptable(V) #If you want the table uncomment this, but it looks somewhat depressing
+      #self.print_dptable(V)
       (prob, state) = max([(V[len(obs) - 1][y], y) for y in states])
-      return (prob, path[state]) #Returns its confidence probability of the most confident path plus the path
-
+      return (prob, fullpath[state])
 
   def Fit(self,observations,states):
    return self.viterbi(observations,states,startDict,transitionDict,emissionDict)
@@ -227,11 +227,15 @@ class BestHMM:
 
   def Score(self, pred, label):
     correct = 0
+    labels = []
 
-    for i in range(len(pred[1])-1): #We're not interested in its confidence level, just its predictions and the last element is empty
-      if pred[1][i] == label[i]: #This should be pretty straightforward!
-        correct+=1
-    result = correct / len(pred[1])
+    for i in range(len(pred)-1):
+      labels.extend(pred[i][1])
+
+    for i in range(len(labels)-1): #We're not interested in its confidence level, just its predictions and the last element is empty
+        if labels[i] == label[i]: #This should be pretty straightforward!
+          correct+=1          
+    result = correct / len(label)
 
     print "acc:\t",result
     return result
@@ -259,23 +263,25 @@ startDict = HMM.St_prob(train_data)
 observations = []
 labels = []
 
+
 #-----------------------------------------------------------------
 #Preparing data for our HMM
 for elem in test_data:
   sent = []
-
   for el in elem:
     sent.append(el[0])
     if len(el) == 2:
       labels.append(el[1])
 
   observations.append(sent)
-
 states = startDict.keys()
 
 #------------------------------------------------------------------
 #The ACTUAL calls...
+results = []
+for sent in observations:
+  Fit = HMM.Fit(sent,states) #Somewhat similar to how SKLearn classifiers' .fit(train) works, but we need to store the result instead
+  results.append(Fit)
+#print Fit #Optional for table / confidence of path + path.. The confidence is quite depressing!
 
-Fit = HMM.Fit(observations,states) #Somewhat similar to how SKLearn classifiers' .fit(train) works, but we need to store the result instead
-print Fit #Optional for table / confidence of path + path.. The confidence is quite depressing!
-HMM.Score(Fit,labels)
+HMM.Score(results,labels)
