@@ -196,7 +196,13 @@ class BestHMM:
       # Initialize base cases (t == 0)
       for y in states:
           tpath = []
-          V[0][y] = max(start_p[y]*0.0833 if not l in emit_p[y].keys() else start_p[y]*emit_p[y][l] for l in obs)
+          
+          if obs[0] in emit_p[y].keys():
+            V[0][y] = start_p[y] * emit_p[y][obs[0]]
+          else:
+            V[0][y] = start_p[y] * 0.0833
+
+          #V[0][y] = max(start_p[y]*0.0833 if not l in emit_p[y].keys() else start_p[y]*emit_p[y][l] for l in obs) - slighty different and worse
           path.append(y)
           fullpath[y] = tpath #We now have a a dict with the start probabilities
 
