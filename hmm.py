@@ -6,14 +6,14 @@ import numpy
 
 ######################################################
 #
-#       Opening & preparing train and test set
+#       Opening & preparing our train and test set
 #
 ######################################################
 
-#train_file = ('twitter-POS/train.google')
-#test_file = ('twitter-POS/test.google')
-train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
-test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
+train_file = ('twitter-POS/train.google')
+test_file = ('twitter-POS/test.google')
+#train_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/train.google')
+#test_file = ('/Users/Maria/Documents/ITandcognition/bin/twitter-POS/test.google')
 
 #split by double newline aka by every new tweet
 test_file2 = open(test_file).read().split("\n\n")
@@ -50,13 +50,18 @@ class BestHMM:
     self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
     self.POS_list= [] # a 1D list of all POS 
     self.Word_POS = [] # Word_POS represents all categorized words that belong to the same POS i.e. Word_POS[1] represents all words that are nouns
-    self.Start_word = [] # a list of all first words of all tweets
+    self.Start_word = []
 
 
     print '(Initializing %s)' % self.name
 
 
   def state_obs(self,test_list):
+#what does this do?
+    for Data in test_list:
+      for data in Data:
+        "do nothing"
+
     states=POS_list
     observations=[]
     for i in range(len(Word_POS)):
@@ -64,7 +69,7 @@ class BestHMM:
            observations.append(Word_POS[i][j])
 
 #---------------------------------------------------------------------------
-# Beginning of probability calculations
+# Here we begin the probability calculations
 
   def Em_prob(self,train_data):
     Calculate_list = self.Calculate_list
@@ -150,7 +155,7 @@ class BestHMM:
 # Start probability this function calculates the probability that a POS belongs to the first word of a tweet
     startdict={} # contains the POS and count
     sum_start=0
-    Start_word=self.Start_word 
+    Start_word=self.Start_word # a list of all first words of all tweets
 
     for i in range(len(train_data)-1):
         Start_word.append(train_data[i][0][1])
@@ -167,7 +172,7 @@ class BestHMM:
 
 
 #---------------------------------------------------------------------------
-# Here we begin to get the viterbi path
+# Here we begin to get the viterbi patch
 
   def print_dptable(self, V):
       print "    ",
@@ -183,38 +188,38 @@ class BestHMM:
   # visualize viterbi
   def viterbi(self, obs, states, start_p, trans_p, emit_p):
       V = [{}]
-      path = {}
       Start_word = self.Start_word
-
+      path=[]
+      fullpath={}#it's a lie!
 
       # Initialize base cases (t == 0)
       for y in states:
-        for x in range(len(Start_word)):
-          V[0][y] = start_p[y]*emit_p[y][Start_word[x]]
-          path[y] = [y]
-      
+
+          if obs[0] in emit_p[y].keys():
+            V[0][y] = start_p[y] * emit_p[y][obs[0]]
+          else:
+            V[0][y] = start_p[y] * 0.0833
+
+          fullpath[y] = [y] #We now have a a dict with the start probabilities
+
       # Run Viterbi for t > 0
       for t in range(1,len(obs)):
-        V.append({})
-        newpath = {}
+          V.append({})
+          newpath = {}
 
-        for y in states:
-          for s in obs[t]:
-            if s in emit_p[y].keys(): #Check whether the word exists
-               (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][s], y0) for y0 in states])
+          for y in states:
+            if obs[t] in emit_p[y].keys(): #Check whether the word exists in our sentences
+              (prob,state) = max([(V[t-1][y0]*trans_p[y0][y]*emit_p[y][obs[t]],y0) for y0 in states])
             else:
-              (prob, state) = max([(V[t-1][y0]*trans_p[y0][y]*0.1, y0) for y0 in states]) # We don't know what class unknown words are, therefore they are equally likely 1/10
-            
+              (prob,state) = max([(V[t-1][y0]*trans_p[y0][y]*0.0833,y0) for y0 in states]) # We don't know what class unknown words are, therefore they are equally likely 1/12, although the actual number is redundant
+          
             V[t][y] = prob
-            newpath[y] = path[state] + [y]  
-        
-          # Don't need to remember the old paths
-        path = newpath
+            newpath[y] = fullpath[state] + [y]
+          fullpath = newpath
    
-      #self.print_dptable(V) #If you want the table uncomment this, but it looks somewhat depressing
+      #self.print_dptable(V)
       (prob, state) = max([(V[len(obs) - 1][y], y) for y in states])
-      return (prob, path[state]) #Returns its confidence probability of the most confident path plus the path
-
+      return (prob, fullpath[state])
 
   def Fit(self,observations,states):
    return self.viterbi(observations,states,startDict,transitionDict,emissionDict)
@@ -222,11 +227,15 @@ class BestHMM:
 
   def Score(self, pred, label):
     correct = 0
+    labels = []
 
-    for i in range(len(pred[1])-1): #We're not interested in its confidence level, just its predictions and the last element is empty
-      if pred[1][i] == label[i]: #This should be pretty straightforward!
-        correct+=1
-    result = correct / len(pred[1])
+    for i in range(len(pred)-1):
+      labels.extend(pred[i][1])
+
+    for i in range(len(labels)-1): #We're not interested in its confidence level, just its predictions and the last element is empty
+        if labels[i] == label[i]: #This should be pretty straightforward!
+          correct+=1          
+    result = correct / len(label)
 
     print "acc:\t",result
     return result
@@ -245,7 +254,7 @@ class BestHMM:
 train_data = prepare_data(train_list)
 test_data = prepare_data(test_list)
 
-#Defining the needed variables to create predictions
+#Here we define our needed variables to create predictions
 HMM = BestHMM()
 emissionDict = HMM.Em_prob(train_data)
 transitionDict = HMM.Tr_prob(train_data)
@@ -254,23 +263,25 @@ startDict = HMM.St_prob(train_data)
 observations = []
 labels = []
 
+
 #-----------------------------------------------------------------
-#Preparing data for the HMM
+#Preparing data for our HMM
 for elem in test_data:
   sent = []
-
   for el in elem:
     sent.append(el[0])
     if len(el) == 2:
       labels.append(el[1])
 
   observations.append(sent)
-
 states = startDict.keys()
 
 #------------------------------------------------------------------
 #The ACTUAL calls...
+results = []
+for sent in observations:
+  Fit = HMM.Fit(sent,states) #Somewhat similar to how SKLearn classifiers' .fit(train) works, but we need to store the result instead
+  results.append(Fit)
+#print Fit #Optional for table / confidence of path + path.. The confidence is quite depressing!
 
-Fit = HMM.Fit(observations,states) #Somewhat similar to how SKLearn classifiers' .fit(train) works, but need to store the result instead
-print Fit #Optional for table / confidence of path + path.. The confidence is quite depressing!
-HMM.Score(Fit,labels)
+HMM.Score(results,labels)
