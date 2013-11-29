@@ -50,18 +50,13 @@ class BestHMM:
     self.Calculate_list = [] # a nested list of all words and their adjecent POS [[word1, POS1], [word2, POS2]...]
     self.POS_list= [] # a 1D list of all POS 
     self.Word_POS = [] # Word_POS represents all categorized words that belong to the same POS i.e. Word_POS[1] represents all words that are nouns
-    self.Start_word = []
+    self.Start_word = [] # a list of all first words of all tweets
 
 
     print '(Initializing %s)' % self.name
 
 
   def state_obs(self,test_list):
-#what does this do?
-    for Data in test_list:
-      for data in Data:
-        "do nothing"
-
     states=POS_list
     observations=[]
     for i in range(len(Word_POS)):
